@@ -103,7 +103,7 @@ async function fetchData(sport, date) {
       } else if (eventType === "finished") {
         gameText.style.color = "green";
       } else if (eventType === "notstarted") {
-        gameText.style.color = "black";
+        gameText.style.color = "white";
       } else if (eventType === "postponed") {
         gameText.style.color = "red";
       }
