@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Hello World Sidebar",
+  "name": "Sports Sidebar",
   "version": "1.0",
-  "description": "A simple Chrome extension that shows 'Hello World' in the sidebar",
+  "description": "A simple Chrome extension that shows sports data in the sidebar",
   "permissions": ["sidePanel"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "index.js"
   },
   "action": {
     "default_title": "Open Hello World Sidebar"
