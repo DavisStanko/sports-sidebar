@@ -108,30 +108,8 @@ async function fetchData(sport, date) {
         gameText.style.color = "red";
       }
 
-      gameText.style.cursor = "pointer";
-      gameText.addEventListener("click", () => fetchEventDetails(event.id));
       scoresDiv.appendChild(gameText);
     });
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
-}
-
-// Function to fetch event details based on the event ID
-async function fetchEventDetails(eventId) {
-  try {
-    const response = await fetch(
-      `https://api.sofascore.com/api/v1/event/${eventId}`
-    );
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    const eventDetails = await response.json();
-
-    // Handle displaying the event details here
-    // For example, log the details or update a div with the info
-    console.log(eventDetails);
-    alert(JSON.stringify(eventDetails, null, 2)); // Display details in a simple alert (for demo)
   } catch (error) {
     console.error("Fetch error:", error);
   }
@@ -150,19 +128,11 @@ document.getElementById("date-select").addEventListener("change", function () {
   fetchData(selectedSport, selectedDate);
 });
 
-// Set default date to current date
+// Set defaults
 document.getElementById("date-select").value = getCurrentDate();
-
-// Fetch initial data for the default sport (American Football) and current date
 fetchData("american-football", getCurrentDate());
 
-// Handle Firefox compatibility (Note: Firefox does not have chrome.sidePanel API)
-if (
-  typeof browser !== "undefined" &&
-  typeof browser.sidebarAction !== "undefined"
-) {
-  browser.sidebarAction.open();
-} else if (typeof chrome.sidePanel !== "undefined") {
-  // Chrome-specific behavior for opening sidePanel
+// Chrome-specific behavior for opening sidePanel
+if (typeof chrome.sidePanel !== "undefined") {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 }
