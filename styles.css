@@ -1,9 +1,9 @@
 /* styles.css */
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  color: #333;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background-color: #2a2a2a; /* Softer dark background */
+  color: #e0e0e0; /* Light gray text for contrast */
   margin: 20px;
 }
 
@@ -11,31 +11,49 @@ label {
   font-weight: bold;
   margin-right: 10px;
   display: block;
+  color: #ffffff; /* White label color */
 }
 
 select {
   padding: 10px;
   margin-bottom: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #666; /* Medium border for better visibility */
   border-radius: 4px;
-  background-color: white;
+  background-color: #3c3c3c; /* Slightly lighter background for select */
+  color: #e0e0e0; /* Light text color */
   font-size: 16px;
 }
 
 input[type="date"] {
   padding: 10px;
   margin-bottom: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #666; /* Medium border for better visibility */
   border-radius: 4px;
-  background-color: white;
+  background-color: #3c3c3c; /* Slightly lighter background for input */
+  color: #e0e0e0; /* Light text color */
   font-size: 16px;
 }
 
 h1 {
-  color: #2c3e50;
+  color: #ffffff; /* White heading color for emphasis */
   margin-bottom: 10px;
 }
 
 p {
   margin: 5px 0 10px 0;
+  color: #d1d1d1; /* Lighter paragraph color for better contrast */
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #4d4d4d; /* Moderate button background */
+  color: #ffffff; /* White button text */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #666; /* Lighter button on hover */
 }
