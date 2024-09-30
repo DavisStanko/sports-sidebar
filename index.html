@@ -7,9 +7,55 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div id="sidebar-content">
-      <h1>Hello World</h1>
-    </div>
-    <script src="sidebar.js"></script>
+    <label for="sport-select">Choose a sport:</label>
+    <select id="sport-select">
+      <!-- Major Sports -->
+      <option value="american-football">American Football</option>
+      <option value="basketball">Basketball</option>
+      <option value="baseball">Baseball</option>
+      <option value="football">Football</option>
+      <option value="ice-hockey">Ice Hockey</option>
+      <option value="tennis">Tennis</option>
+
+      <!-- Alphabetically Sorted -->
+      <option value="aussie-rules">Aussie Rules</option>
+      <option value="badminton">Badminton</option>
+      <option value="bandy">Bandy</option>
+      <option value="beach-volleyball">Beach Volleyball</option>
+      <option value="cricket">Cricket</option>
+      <option value="cycling">Cycling</option>
+      <option value="darts">Darts</option>
+      <option value="esports">Esports</option>
+      <option value="floorball">Floorball</option>
+      <option value="futsal">Futsal</option>
+      <option value="handball">Handball</option>
+      <option value="minifootball">Minifootball</option>
+      <option value="mma">MMA</option>
+      <option value="motorsport">Motorsport</option>
+      <option value="rugby">Rugby</option>
+      <option value="snooker">Snooker</option>
+      <option value="table-tennis">Table Tennis</option>
+      <option value="volleyball">Volleyball</option>
+      <option value="water-polo">Water Polo</option>
+    </select>
+
+    <br /><br />
+
+    <label for="date-select">Choose a date:</label>
+    <input type="date" id="date-select" />
+
+    <label>
+      <input type="checkbox" id="hide-finished" />
+      Hide Finished Games
+    </label>
+
+    <label>
+      <input type="checkbox" id="hide-not-started" />
+      Hide Upcoming Games
+    </label>
+
+    <div id="scores"></div>
+
+    <script src="index.js"></script>
   </body>
 </html>
