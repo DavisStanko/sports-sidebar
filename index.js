@@ -41,6 +41,13 @@ document
     fetchData(selectedSport, selectedDate);
   });
 
+// Handle longnames checkbox changes and reload the extension
+document.getElementById("longnames").addEventListener("change", function () {
+  const selectedSport = document.getElementById("sport-select").value;
+  const selectedDate = document.getElementById("date-select").value;
+  fetchData(selectedSport, selectedDate); // Reload data with new names
+});
+
 async function fetchData(sport, date) {
   try {
     const response = await fetch(
@@ -53,13 +60,50 @@ async function fetchData(sport, date) {
     const scoresDiv = document.getElementById("scores");
     scoresDiv.innerHTML = "";
 
-    if (data.events.length === 0) {
-      scoresDiv.innerHTML = "<p>No games available for the selected date.</p>";
-      return;
-    }
-
     const hideFinished = document.getElementById("hide-finished").checked;
     const hideNotStarted = document.getElementById("hide-not-started").checked;
+    const longnames = document.getElementById("longnames").checked;
+
+    // Get the current date
+    const currentDate = new Date();
+
+    // Adjust the time to UTC (GMT 0) since the API returns timestamps in EST (GMT -4)
+    const currentDateString = currentDate
+      .toLocaleDateString("en-US", {
+        timeZone: "America/New_York",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })
+      .split("/")
+      .reverse()
+      .join("-");
+
+    // Filter out events from yesterday
+    data.events = data.events.filter((event) => {
+      const eventDate = new Date(event.startTimestamp * 1000); // Convert to milliseconds
+      const eventDateString = eventDate
+        .toLocaleDateString("en-US", {
+          timeZone: "America/New_York",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })
+        .split("/")
+        .reverse()
+        .join("-");
+
+      // Check if the event is from today
+      return eventDateString === currentDateString; // Only include today's events
+    });
+
+    // If no events are found, display a message
+    if (data.events.length === 0) {
+      const noEventsMessage = document.createElement("p");
+      noEventsMessage.textContent = "No events are scheduled for today.";
+      scoresDiv.appendChild(noEventsMessage);
+      return; // Exit the function early
+    }
 
     // Define the priority list for major leagues
     const majorLeagues = ["NBA", "MLB", "NHL", "NFL"];
@@ -106,11 +150,16 @@ async function fetchData(sport, date) {
         scoresDiv.appendChild(leagueTitle);
       }
 
-      const homeTeam = event.homeTeam.name;
-      const awayTeam = event.awayTeam.name;
+      const homeTeam = longnames
+        ? event.homeTeam.name
+        : event.homeTeam.shortName;
+      const awayTeam = longnames
+        ? event.awayTeam.name
+        : event.awayTeam.shortName;
       const homeID = event.homeTeam.id;
       const awayID = event.awayTeam.id;
       const startTime = event.startTimestamp;
+
       let winner = null;
       if (event.winnerCode === 1) {
         winner = homeTeam;
@@ -143,9 +192,12 @@ async function fetchData(sport, date) {
       // Event timestamp section
       const eventTimestamp = document.createElement("span");
       const eventDate = new Date(startTime * 1000); // Convert to milliseconds
-      const hours = eventDate.getHours();
+      let hours = eventDate.getHours();
       const minutes = eventDate.getMinutes().toString().padStart(2, "0");
-      eventTimestamp.textContent = `${hours}:${minutes}`;
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12; // The hour '0' should be '12'
+      eventTimestamp.textContent = `${hours}:${minutes} ${ampm}`;
       eventTimestamp.style.marginBottom = "5px"; // Space between timestamp and event type
 
       // Event type section
