@@ -1,60 +1,64 @@
-/* styles.css */
-
+/* Body Styles */
 body {
   font-family: "Helvetica Neue", Arial, sans-serif;
-  background-color: #2a2a2a; /* Softer dark background */
-  color: #e0e0e0; /* Light gray text for contrast */
+  background-color: #2a2a2a;
+  color: #e0e0e0;
   margin: 20px;
+  padding: 10px;
   font-size: 14px;
 }
 
-label {
-  font-weight: bold;
-  margin-right: 10px;
-  display: block;
-  color: #ffffff; /* White label color */
-}
-
-select {
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #666; /* Medium border for better visibility */
-  border-radius: 4px;
-  background-color: #3c3c3c; /* Slightly lighter background for select */
-  color: #e0e0e0; /* Light text color */
-  font-size: 16px;
-}
-
-input[type="date"] {
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #666; /* Medium border for better visibility */
-  border-radius: 4px;
-  background-color: #3c3c3c; /* Slightly lighter background for input */
-  color: #e0e0e0; /* Light text color */
-  font-size: 16px;
-}
-
+/* Heading and Paragraph Styles */
 h1 {
-  color: #ffffff; /* White heading color for emphasis */
-  margin-bottom: 10px;
+  color: #ffffff;
+  margin-bottom: 15px;
 }
 
 p {
-  margin: 5px 0 10px 0;
-  color: #d1d1d1; /* Lighter paragraph color for better contrast */
+  margin: 0 0 15px 0;
+  color: #d1d1d1;
 }
 
-button {
-  padding: 10px 15px;
-  background-color: #4d4d4d; /* Moderate button background */
-  color: #ffffff; /* White button text */
-  border: none;
+/* Form Element Styles */
+label {
+  font-weight: bold;
+  margin: 5px 0;
+  display: block;
+  color: #ffffff;
+}
+
+select,
+input[type="date"] {
+  background-color: #3c3c3c;
+  color: #e0e0e0;
+  border: 1px solid #666;
   border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  padding: 10px;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-button:hover {
-  background-color: #666; /* Lighter button on hover */
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 5px;
+}
+
+.checkboxes {
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+/* Separator Styles */
+.separator {
+  border: none;
+  border-top: 1px solid #444;
+  margin-bottom: 20px;
+}
+
+/* Summary Styles */
+summary {
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 15px;
 }
