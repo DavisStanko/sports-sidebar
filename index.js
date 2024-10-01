@@ -86,6 +86,16 @@ async function fetchData(sport, date) {
 
       const homeTeam = event.homeTeam.name;
       const awayTeam = event.awayTeam.name;
+      const homeID = event.homeTeam.id;
+      const awayID = event.awayTeam.id;
+      const startTime = event.startTimestamp;
+      let winner = null;
+      if (event.winnerCode === 1) {
+        winner = homeTeam;
+      } else if (event.winnerCode === 2) {
+        winner = awayTeam;
+      }
+
       const homeScore =
         event.homeScore && Object.keys(event.homeScore).length > 0
           ? event.homeScore.display
@@ -95,20 +105,106 @@ async function fetchData(sport, date) {
           ? event.awayScore.display
           : "TBD";
 
-      const gameText = document.createElement("p");
-      gameText.textContent = `${homeTeam} (${homeScore}) vs ${awayTeam} (${awayScore})`;
+      // Create game container
+      const gameContainer = document.createElement("div");
+      gameContainer.style.display = "flex";
+      gameContainer.style.alignItems = "center"; // Center vertically
+      gameContainer.style.marginBottom = "10px";
 
+      // Create a column for time and type
+      const eventInfoContainer = document.createElement("div");
+      eventInfoContainer.style.display = "flex";
+      eventInfoContainer.style.flexDirection = "column";
+      eventInfoContainer.style.alignItems = "center"; // Center items vertically
+      eventInfoContainer.style.marginRight = "20px"; // Space between time/type and teams
+
+      // Event timestamp section
+      const eventTimestamp = document.createElement("span");
+      const eventDate = new Date(startTime * 1000); // Convert to milliseconds
+      const hours = eventDate.getHours();
+      const minutes = eventDate.getMinutes().toString().padStart(2, "0");
+      eventTimestamp.textContent = `${hours}:${minutes}`;
+      eventTimestamp.style.marginBottom = "5px"; // Space between timestamp and event type
+
+      // Event type section
+      const eventTypeText = document.createElement("span");
+
+      // Color the event type based on its status
       if (eventType === "inprogress") {
-        gameText.style.color = "orange";
+        eventTypeText.style.color = "orange";
+        eventTypeText.textContent = "In Progress";
       } else if (eventType === "finished") {
-        gameText.style.color = "green";
+        eventTypeText.style.color = "green";
+        eventTypeText.textContent = "Finished";
       } else if (eventType === "notstarted") {
-        gameText.style.color = "white";
+        eventTypeText.style.color = "white";
+        eventTypeText.textContent = "Not Started";
       } else if (eventType === "postponed") {
-        gameText.style.color = "red";
+        eventTypeText.style.color = "red";
+        eventTypeText.textContent = "Postponed";
       }
 
-      scoresDiv.appendChild(gameText);
+      // Append timestamp and event type to the info container
+      eventInfoContainer.appendChild(eventTimestamp);
+      eventInfoContainer.appendChild(eventTypeText);
+
+      // Append the info container to the game container
+      gameContainer.appendChild(eventInfoContainer);
+
+      // Teams container
+      const teamsContainer = document.createElement("div");
+      teamsContainer.style.display = "flex";
+      teamsContainer.style.flexDirection = "column";
+      teamsContainer.style.alignItems = "flex-start"; // Align teams to the start
+
+      // Home team section
+      const homeTeamDiv = document.createElement("div");
+      homeTeamDiv.style.display = "flex";
+      homeTeamDiv.style.alignItems = "center";
+
+      const homeLogo = document.createElement("img");
+      homeLogo.src = `https://api.sofascore.app/api/v1/team/${homeID}/image`;
+      homeLogo.alt = `${homeTeam} logo`;
+      homeLogo.style.width = "24px";
+      homeLogo.style.height = "24px";
+      homeLogo.style.marginRight = "10px";
+
+      const homeTeamText = document.createElement("span");
+      homeTeamText.textContent = `${homeTeam} (${homeScore})`;
+      homeTeamDiv.appendChild(homeLogo);
+      homeTeamDiv.appendChild(homeTeamText);
+      teamsContainer.appendChild(homeTeamDiv);
+
+      // Away team section
+      const awayTeamDiv = document.createElement("div");
+      awayTeamDiv.style.display = "flex";
+      awayTeamDiv.style.alignItems = "center";
+
+      const awayLogo = document.createElement("img");
+      awayLogo.src = `https://api.sofascore.app/api/v1/team/${awayID}/image`;
+      awayLogo.alt = `${awayTeam} logo`;
+      awayLogo.style.width = "24px";
+      awayLogo.style.height = "24px";
+      awayLogo.style.marginRight = "10px";
+
+      const awayTeamText = document.createElement("span");
+      awayTeamText.textContent = `${awayTeam} (${awayScore})`;
+      awayTeamDiv.appendChild(awayLogo);
+      awayTeamDiv.appendChild(awayTeamText);
+      teamsContainer.appendChild(awayTeamDiv);
+
+      // Dim the losing team's text
+      if (winner) {
+        if (winner === homeTeam) {
+          awayTeamText.style.opacity = "0.5"; // Dim the away team text
+        } else if (winner === awayTeam) {
+          homeTeamText.style.opacity = "0.5"; // Dim the home team text
+        }
+      }
+
+      // Append the teams container to the game container
+      gameContainer.appendChild(teamsContainer);
+      scoresDiv.appendChild(gameContainer);
     });
   } catch (error) {
     console.error("Fetch error:", error);
