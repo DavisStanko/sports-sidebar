@@ -61,8 +61,30 @@ async function fetchData(sport, date) {
     const hideFinished = document.getElementById("hide-finished").checked;
     const hideNotStarted = document.getElementById("hide-not-started").checked;
 
+    // Define the priority list for major leagues
+    const majorLeagues = ["NBA", "MLB", "NHL", "NFL"];
+
     // Track the leagues displayed
     const displayedLeagues = new Set();
+
+    // Sort events: Major leagues first
+    data.events.sort((a, b) => {
+      const leagueA = a.tournament.name;
+      const leagueB = b.tournament.name;
+
+      const isMajorA = majorLeagues.some((major) => leagueA.includes(major));
+      const isMajorB = majorLeagues.some((major) => leagueB.includes(major));
+
+      // If both leagues are major leagues or neither are, sort by order in the array
+      if (isMajorA && isMajorB) {
+        return 0;
+      } else if (isMajorA) {
+        return -1;
+      } else if (isMajorB) {
+        return 1;
+      }
+      return 0;
+    });
 
     data.events.forEach((event) => {
       const eventType = event.status.type;
