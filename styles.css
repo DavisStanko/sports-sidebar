@@ -5,6 +5,7 @@ body {
   background-color: #2a2a2a; /* Softer dark background */
   color: #e0e0e0; /* Light gray text for contrast */
   margin: 20px;
+  font-size: 14px;
 }
 
 label {
