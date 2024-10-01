@@ -306,3 +306,10 @@ fetchData("american-football", getCurrentDate());
 if (typeof chrome.sidePanel !== "undefined") {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 }
+
+// Re-fetch the data every minute
+setInterval(() => {
+  const selectedSport = document.getElementById("sport-select").value;
+  const selectedDate = document.getElementById("date-select").value;
+  fetchData(selectedSport, selectedDate);
+}, 60000);
