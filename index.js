@@ -64,39 +64,6 @@ async function fetchData(sport, date) {
     const hideNotStarted = document.getElementById("hide-not-started").checked;
     const longnames = document.getElementById("longnames").checked;
 
-    // Get the current date
-    const currentDate = new Date();
-
-    // Adjust the time to UTC (GMT 0) since the API returns timestamps in EST (GMT -4)
-    const currentDateString = currentDate
-      .toLocaleDateString("en-US", {
-        timeZone: "America/New_York",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })
-      .split("/")
-      .reverse()
-      .join("-");
-
-    // Filter out events from yesterday
-    data.events = data.events.filter((event) => {
-      const eventDate = new Date(event.startTimestamp * 1000); // Convert to milliseconds
-      const eventDateString = eventDate
-        .toLocaleDateString("en-US", {
-          timeZone: "America/New_York",
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        })
-        .split("/")
-        .reverse()
-        .join("-");
-
-      // Check if the event is from today
-      return eventDateString === currentDateString; // Only include today's events
-    });
-
     // If no events are found, display a message
     if (data.events.length === 0) {
       const noEventsMessage = document.createElement("p");
@@ -312,4 +279,4 @@ setInterval(() => {
   const selectedSport = document.getElementById("sport-select").value;
   const selectedDate = document.getElementById("date-select").value;
   fetchData(selectedSport, selectedDate);
-}, 60000);
+}, 60000); // 60000 milliseconds = 1 minute
