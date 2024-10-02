@@ -26,6 +26,12 @@ label {
   display: block;
   color: #ffffff;
 }
+details:hover,
+select:hover,
+input[type="date"]:hover,
+input[type="checkbox"]:hover {
+  cursor: pointer;
+}
 
 select,
 input[type="date"] {
