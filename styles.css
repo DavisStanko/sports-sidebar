@@ -68,3 +68,15 @@ summary {
   font-weight: bold;
   margin-bottom: 15px;
 }
+
+/* Target the team name and score div */
+div#scores div span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* To align wrapped text centrally if it's a multi-line item */
+div#scores div span {
+  text-align: center;
+}

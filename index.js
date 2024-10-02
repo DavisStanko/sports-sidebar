@@ -313,11 +313,18 @@ function createTeamsContainer(event, longnames) {
   return teamsContainer;
 }
 
-// Create individual team div with logo and score
+// Create individual team div with logo and separate score
 function createTeamDiv(team, score, longnames) {
   const teamDiv = document.createElement("div");
   teamDiv.style.display = "flex";
   teamDiv.style.alignItems = "center";
+  teamDiv.style.justifyContent = "space-between"; // Ensure space between team name and score
+  teamDiv.style.width = "100%"; // Ensure the container spans the full width
+
+  // Team container (logo and name)
+  const teamInfoDiv = document.createElement("div");
+  teamInfoDiv.style.display = "flex";
+  teamInfoDiv.style.alignItems = "center";
 
   const teamLogo = document.createElement("img");
   teamLogo.src = `${BASE_APP_URL}/team/${team.id}/image`;
@@ -325,14 +332,32 @@ function createTeamDiv(team, score, longnames) {
   teamLogo.style.width = "24px";
   teamLogo.style.height = "24px";
   teamLogo.style.marginRight = "10px";
+  teamLogo.style.marginBottom = "5px";
 
   const teamName = longnames ? team.name : team.shortName;
-  const teamScore = score?.display || "TBD";
-  const teamText = document.createElement("span");
-  teamText.textContent = `${teamName} (${teamScore})`;
 
-  teamDiv.appendChild(teamLogo);
-  teamDiv.appendChild(teamText);
+  // Set a fixed width to ensure alignment
+  const teamNameText = document.createElement("span");
+  teamNameText.textContent = teamName;
+  teamNameText.style.width = "150px"; // Set a fixed width for the team name
+  teamNameText.style.whiteSpace = "nowrap"; // Prevents text wrapping
+  teamNameText.style.overflow = "hidden"; // Ensures the name doesn't overflow
+  teamNameText.style.textOverflow = "ellipsis"; // Adds ellipsis if text is too long
+  teamNameText.style.textAlign = "left"; // Aligns the team name to the left
+
+  teamInfoDiv.appendChild(teamLogo);
+  teamInfoDiv.appendChild(teamNameText);
+
+  // Score container
+  const scoreDiv = document.createElement("div");
+  scoreDiv.style.textAlign = "right"; // Align score to the right
+  scoreDiv.style.minWidth = "40px"; // Ensure a minimum width for score for alignment
+  const teamScore = score?.display || "TBD";
+  scoreDiv.textContent = teamScore;
+
+  // Append both containers to the main teamDiv
+  teamDiv.appendChild(teamInfoDiv);
+  teamDiv.appendChild(scoreDiv);
 
   return teamDiv;
 }
