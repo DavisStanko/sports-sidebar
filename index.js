@@ -20,6 +20,28 @@ function getCurrentDate() {
   return `${year}-${month}-${day}`;
 }
 
+// Load values from local storage (or use defaults)
+function loadSettings() {
+  const sport = localStorage.getItem("selectedSport") || "american-football";
+  // Date is set to today by default
+  const hideFinished = localStorage.getItem("hideFinished") === "true";
+  const hideNotStarted = localStorage.getItem("hideNotStarted") === "true";
+  const longnames = localStorage.getItem("longnames") === "true";
+
+  sportSelect.value = sport;
+  hideFinishedCheckbox.checked = hideFinished;
+  hideNotStartedCheckbox.checked = hideNotStarted;
+  longnamesCheckbox.checked = longnames;
+}
+
+// Save values to local storage
+function saveSettings() {
+  localStorage.setItem("selectedSport", sportSelect.value);
+  localStorage.setItem("hideFinished", hideFinishedCheckbox.checked);
+  localStorage.setItem("hideNotStarted", hideNotStartedCheckbox.checked);
+  localStorage.setItem("longnames", longnamesCheckbox.checked);
+}
+
 // Event Listeners
 function setupEventListeners() {
   sportSelect.addEventListener("change", handleSportChange);
@@ -30,24 +52,28 @@ function setupEventListeners() {
 }
 
 function handleSportChange() {
+  saveSettings();
   const selectedSport = sportSelect.value;
   const selectedDate = dateSelect.value;
   fetchData(selectedSport, selectedDate);
 }
 
 function handleDateChange() {
+  saveSettings();
   const selectedSport = sportSelect.value;
   const selectedDate = this.value;
   fetchData(selectedSport, selectedDate);
 }
 
 function handleFilterChange() {
+  saveSettings();
   const selectedSport = sportSelect.value;
   const selectedDate = dateSelect.value;
   fetchData(selectedSport, selectedDate);
 }
 
 function handleLongNamesChange() {
+  saveSettings();
   const selectedSport = sportSelect.value;
   const selectedDate = dateSelect.value;
   fetchData(selectedSport, selectedDate);
@@ -66,7 +92,7 @@ async function fetchData(sport, date) {
 
     // If no events, display a message and exit
     if (data.events.length === 0) {
-      displayNoEventsMessage(scoresDiv);
+      displayNoEventsMessage(scoresDiv, "No events are scheduled for today.");
       return;
     }
 
@@ -80,6 +106,14 @@ async function fetchData(sport, date) {
       hideNotStarted,
       longnames,
     });
+
+    // If no events are displayed after the filters, display a message
+    if (scoresDiv.children.length === 0) {
+      displayNoEventsMessage(
+        scoresDiv,
+        "No events match the selected filters."
+      );
+    }
   } catch (error) {
     console.error("Fetch error:", error);
   }
@@ -97,9 +131,9 @@ async function fetchEventData(sport, date) {
 }
 
 // Display message when no events are found
-function displayNoEventsMessage(scoresDiv) {
+function displayNoEventsMessage(scoresDiv, message) {
   const noEventsMessage = document.createElement("p");
-  noEventsMessage.textContent = "No events are scheduled for today.";
+  noEventsMessage.textContent = message;
   scoresDiv.appendChild(noEventsMessage);
 }
 
@@ -317,9 +351,10 @@ function dimLosingTeam(event, homeTeamDiv, awayTeamDiv) {
 
 // Set default date and fetch initial data
 function initializeApp() {
+  loadSettings();
   const currentDate = getCurrentDate();
   dateSelect.value = currentDate;
-  fetchData("american-football", currentDate);
+  fetchData(sportSelect.value, currentDate);
 
   // Set up the side panel (Chrome-based browsers only)
   setupSidePanel();
