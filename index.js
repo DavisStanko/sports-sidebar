@@ -127,6 +127,14 @@ async function fetchData(sport, date) {
       const awayID = event.awayTeam.id;
       const startTime = event.startTimestamp;
 
+      const eventDateObj = new Date((startTime - 4 * 3600) * 1000); // shift time to EST
+      const selectedDateObj = new Date(date);
+
+      // Check if the event date is before the selected date
+      if (eventDateObj < selectedDateObj) {
+        return;
+      }
+
       let winner = null;
       if (event.winnerCode === 1) {
         winner = homeTeam;
