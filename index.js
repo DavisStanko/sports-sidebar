@@ -181,6 +181,14 @@ function renderEvent(scoresDiv, event, longnames) {
   );
   const teamsContainer = createTeamsContainer(event, longnames);
 
+  // Add onclick to open the event link
+  gameContainer.onclick = () => {
+    const sport = sportSelect.value;
+    const url = `https://www.sofascore.com/${sport}/match/${event.slug}/${event.customId}`;
+    window.open(url, "_blank");
+  };
+  gameContainer.style.cursor = "pointer";
+
   gameContainer.appendChild(eventInfoContainer);
   gameContainer.appendChild(teamsContainer);
   scoresDiv.appendChild(gameContainer);
