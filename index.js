@@ -32,7 +32,7 @@ function formatEventTime(timestamp) {
 
 // Settings Management
 function loadSettings() {
-  const sport = localStorage.getItem("selectedSport") || "american-football";
+  const sport = localStorage.getItem("selectedSport") || "football";
   const hideFinished = localStorage.getItem("hideFinished") === "true";
   const hideNotStarted = localStorage.getItem("hideNotStarted") === "true";
   const longnames = localStorage.getItem("longnames") === "true";
@@ -94,7 +94,12 @@ async function fetchData(sport, date) {
     };
 
     if (data.events.length === 0) {
-      displayNoEventsMessage(scoresDiv, "No events are scheduled for today.");
+      const sport =
+        sportSelect.options[sportSelect.selectedIndex].text.toLowerCase();
+      displayNoEventsMessage(
+        scoresDiv,
+        `No ${sport} events are scheduled for today.`
+      );
       return;
     }
 
@@ -185,14 +190,18 @@ function addLeagueHeader(scoresDiv, league) {
   scoresDiv.appendChild(leagueTitle);
 }
 
+// Main function to render an event
 function renderEvent(scoresDiv, event, longnames) {
   const gameContainer = createGameContainer();
+
+  // Create event info and teams containers
   const eventInfoContainer = createEventInfoContainer(
     event.startTimestamp,
     event.status.type
   );
   const teamsContainer = createTeamsContainer(event, longnames);
 
+  // Set up click event to open match URL
   gameContainer.onclick = () => {
     const sport = sportSelect.value;
     const url = `${BASE_WEBSITE_URL}/${sport}/match/${event.slug}/${event.customId}`;
@@ -200,11 +209,15 @@ function renderEvent(scoresDiv, event, longnames) {
   };
   gameContainer.style.cursor = "pointer";
 
+  // Append child elements to game container
   gameContainer.appendChild(eventInfoContainer);
   gameContainer.appendChild(teamsContainer);
+
+  // Append game container to scores div
   scoresDiv.appendChild(gameContainer);
 }
 
+// Create a game container
 function createGameContainer() {
   const gameContainer = document.createElement("div");
   gameContainer.style.display = "flex";
@@ -213,88 +226,133 @@ function createGameContainer() {
   return gameContainer;
 }
 
+// Create an event info container
 function createEventInfoContainer(startTime, eventType) {
   const eventInfoContainer = document.createElement("div");
   eventInfoContainer.style.display = "flex";
   eventInfoContainer.style.flexDirection = "column";
   eventInfoContainer.style.alignItems = "center";
   eventInfoContainer.style.marginRight = "20px";
+  eventInfoContainer.style.minWidth = "72px";
 
+  // Add event timestamp
   const eventTimestamp = document.createElement("span");
   eventTimestamp.textContent = formatEventTime(startTime);
   eventInfoContainer.appendChild(eventTimestamp);
 
+  // Add event type text
   const eventTypeText = createEventTypeText(eventType);
   eventInfoContainer.appendChild(eventTypeText);
 
   return eventInfoContainer;
 }
 
+// Create event type text element
 function createEventTypeText(eventType) {
   const eventTypeText = document.createElement("span");
-
-  switch (eventType) {
-    case "inprogress":
-      eventTypeText.style.color = "orange";
-      eventTypeText.textContent = "In Progress";
-      break;
-    case "finished":
-      eventTypeText.style.color = "green";
-      eventTypeText.textContent = "Finished";
-      break;
-    case "notstarted":
-      eventTypeText.style.color = "white";
-      eventTypeText.textContent = "Not Started";
-      break;
-    case "postponed":
-      eventTypeText.style.color = "red";
-      eventTypeText.textContent = "Postponed";
-      break;
-    default:
-      eventTypeText.textContent = "Unknown";
-  }
-
+  eventTypeText.style.color = getEventTypeColor(eventType);
+  eventTypeText.textContent = getEventTypeText(eventType);
   return eventTypeText;
 }
 
+// Helper function to get color based on event type
+function getEventTypeColor(eventType) {
+  switch (eventType) {
+    case "inprogress":
+      return "orange";
+    case "finished":
+      return "green";
+    case "notstarted":
+      return "white";
+    case "postponed":
+      return "red";
+    default:
+      return "white";
+  }
+}
+
+// Helper function to get text based on event type
+function getEventTypeText(eventType) {
+  switch (eventType) {
+    case "inprogress":
+      return "In Progress";
+    case "finished":
+      return "Finished";
+    case "notstarted":
+      return "Not Started";
+    case "postponed":
+      return "Postponed";
+    default:
+      return "Unknown";
+  }
+}
+
+// Create a container for teams
 function createTeamsContainer(event, longnames) {
   const teamsContainer = document.createElement("div");
-  teamsContainer.style.display = "flex";
-  teamsContainer.style.flexDirection = "column";
-  teamsContainer.style.alignItems = "flex-start";
 
+  // Create team divs for home and away teams
   const homeTeamDiv = createTeamDiv(event.homeTeam, event.homeScore, longnames);
   const awayTeamDiv = createTeamDiv(event.awayTeam, event.awayScore, longnames);
 
+  // Dim the losing team
   dimLosingTeam(event, homeTeamDiv, awayTeamDiv);
 
+  // Append team divs to teams container
   teamsContainer.appendChild(homeTeamDiv);
   teamsContainer.appendChild(awayTeamDiv);
 
   return teamsContainer;
 }
 
+// Create a team div
 function createTeamDiv(team, score, longnames) {
   const teamDiv = document.createElement("div");
   teamDiv.style.display = "flex";
   teamDiv.style.alignItems = "center";
   teamDiv.style.justifyContent = "space-between";
   teamDiv.style.width = "100%";
+  teamDiv.style.marginBottom = "5px";
 
+  const teamInfoDiv = createTeamInfoDiv(team, longnames);
+  const scoreDiv = createScoreDiv(score);
+
+  teamDiv.appendChild(teamInfoDiv);
+  teamDiv.appendChild(scoreDiv);
+
+  return teamDiv;
+}
+
+// Create a div for team info
+function createTeamInfoDiv(team, longnames) {
   const teamInfoDiv = document.createElement("div");
   teamInfoDiv.style.display = "flex";
   teamInfoDiv.style.alignItems = "center";
+  teamInfoDiv.style.flexGrow = "1";
 
+  const teamLogo = createTeamLogo(team);
+  const teamNameText = createTeamNameText(team, longnames);
+
+  teamInfoDiv.appendChild(teamLogo);
+  teamInfoDiv.appendChild(teamNameText);
+
+  return teamInfoDiv;
+}
+
+// Create team logo element
+function createTeamLogo(team) {
   const teamLogo = document.createElement("img");
   teamLogo.src = `${BASE_APP_URL}/team/${team.id}/image`;
   teamLogo.alt = `${team.name} logo`;
   teamLogo.style.width = "24px";
   teamLogo.style.height = "24px";
   teamLogo.style.marginRight = "10px";
-  teamLogo.style.marginBottom = "5px";
+  return teamLogo;
+}
 
+// Create team name text element
+function createTeamNameText(team, longnames) {
   const teamName = longnames ? team.name : team.shortName;
-
   const teamNameText = document.createElement("span");
   teamNameText.textContent = teamName;
   teamNameText.style.width = "150px";
@@ -302,20 +360,28 @@ function createTeamDiv(team, score, longnames) {
   teamNameText.style.overflow = "hidden";
   teamNameText.style.textOverflow = "ellipsis";
   teamNameText.style.textAlign = "left";
+  return teamNameText;
+}
 
-  teamInfoDiv.appendChild(teamLogo);
-  teamInfoDiv.appendChild(teamNameText);
-
+// Create score div
+function createScoreDiv(score) {
   const scoreDiv = document.createElement("div");
   scoreDiv.style.textAlign = "right";
   scoreDiv.style.minWidth = "40px";
-  const teamScore = score?.display || "TBD";
-  scoreDiv.textContent = teamScore;
+  scoreDiv.textContent = score?.display || "TBD";
+  return scoreDiv;
+}
 
-  teamDiv.appendChild(teamInfoDiv);
-  teamDiv.appendChild(scoreDiv);
+// Dim the losing team based on the event
+function dimLosingTeam(event, homeTeamDiv, awayTeamDiv) {
+  const homeTeamText = homeTeamDiv.querySelector("span");
+  const awayTeamText = awayTeamDiv.querySelector("span");
 
-  return teamDiv;
+  if (event.winnerCode === 1) {
+    awayTeamText.style.opacity = "0.5";
+  } else if (event.winnerCode === 2) {
+    homeTeamText.style.opacity = "0.5";
+  }
 }
 
 function dimLosingTeam(event, homeTeamDiv, awayTeamDiv) {
