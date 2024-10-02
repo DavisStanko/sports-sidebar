@@ -1,8 +1,18 @@
-chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error(error));
+// Consts
+const BASE_API_URL = "https://api.sofascore.com/api/v1";
+const BASE_APP_URL = "https://api.sofascore.app/api/v1";
+const MAJOR_LEAGUES = ["NBA", "MLB", "NHL", "NFL"];
+const REFRESH_INTERVAL = 60000; // 1 minute
 
-// Function to get the current date in the format YYYY-MM-DD
+// DOM elements
+const sportSelect = document.getElementById("sport-select");
+const dateSelect = document.getElementById("date-select");
+const hideFinishedCheckbox = document.getElementById("hide-finished");
+const hideNotStartedCheckbox = document.getElementById("hide-not-started");
+const longnamesCheckbox = document.getElementById("longnames");
+
+// Utility functions
+// Todo: split into get and format functions
 function getCurrentDate() {
   const today = new Date();
   const year = today.getFullYear();
@@ -11,7 +21,7 @@ function getCurrentDate() {
   return `${year}-${month}-${day}`;
 }
 
-// Set up event listeners for sport and date selection
+// Listeners
 document.getElementById("sport-select").addEventListener("change", function () {
   const selectedSport = this.value;
   const selectedDate = document.getElementById("date-select").value;
@@ -24,7 +34,6 @@ document.getElementById("date-select").addEventListener("change", function () {
   fetchData(selectedSport, selectedDate);
 });
 
-// Handle checkbox changes
 document
   .getElementById("hide-finished")
   .addEventListener("change", function () {
@@ -41,7 +50,6 @@ document
     fetchData(selectedSport, selectedDate);
   });
 
-// Handle longnames checkbox changes and reload the extension
 document.getElementById("longnames").addEventListener("change", function () {
   const selectedSport = document.getElementById("sport-select").value;
   const selectedDate = document.getElementById("date-select").value;
@@ -51,12 +59,13 @@ document.getElementById("longnames").addEventListener("change", function () {
 async function fetchData(sport, date) {
   try {
     const response = await fetch(
-      `https://api.sofascore.com/api/v1/sport/${sport}/scheduled-events/${date}`
+      `${BASE_API_URL}/sport/${sport}/scheduled-events/${date}`
     );
     if (!response.ok) {
       throw new Error("Network response was not ok");
     }
     const data = await response.json();
+
     const scoresDiv = document.getElementById("scores");
     scoresDiv.innerHTML = "";
 
@@ -72,9 +81,6 @@ async function fetchData(sport, date) {
       return; // Exit the function early
     }
 
-    // Define the priority list for major leagues
-    const majorLeagues = ["NBA", "MLB", "NHL", "NFL"];
-
     // Track the leagues displayed
     const displayedLeagues = new Set();
 
@@ -83,10 +89,10 @@ async function fetchData(sport, date) {
       const leagueA = a.tournament.name;
       const leagueB = b.tournament.name;
 
-      const isMajorA = majorLeagues.some((major) => leagueA.includes(major));
-      const isMajorB = majorLeagues.some((major) => leagueB.includes(major));
+      const isMajorA = MAJOR_LEAGUES.some((major) => leagueA.includes(major));
+      const isMajorB = MAJOR_LEAGUES.some((major) => leagueB.includes(major));
 
-      // If both leagues are major leagues or neither are, sort by order in the array
+      // Sort in case multiple major leagues are present, should never happen
       if (isMajorA && isMajorB) {
         return 0;
       } else if (isMajorA) {
@@ -99,22 +105,35 @@ async function fetchData(sport, date) {
 
     data.events.forEach((event) => {
       const eventType = event.status.type;
+      const league = event.tournament.name;
+
+      // check if the event date is before the selected date
+      const startTime = event.startTimestamp;
+      const eventDateObj = new Date((startTime - 4 * 3600) * 1000); // shift time to EST
+      const selectedDateObj = new Date(date);
+
+      if (eventDateObj < selectedDateObj) {
+        return;
+      }
+
+      // Skip if the game should be hidden
       if (
         (hideFinished && eventType === "finished") ||
         (hideNotStarted && eventType === "notstarted")
       ) {
-        return; // Skip if the game should be hidden
+        return;
       }
 
-      const league = event.tournament.name;
+      // Only display the league name for the first valid game in the league
+      let leagueHasGames = displayedLeagues.has(league);
 
-      // Only display the league name for the first game of the league
-      if (!displayedLeagues.has(league)) {
+      if (!leagueHasGames) {
         displayedLeagues.add(league);
         const leagueTitle = document.createElement("h3");
         leagueTitle.style.fontWeight = "bold";
         leagueTitle.textContent = league;
         scoresDiv.appendChild(leagueTitle);
+        leagueHasGames = true; // Set flag to true since a game has been added
       }
 
       const homeTeam = longnames
@@ -125,10 +144,6 @@ async function fetchData(sport, date) {
         : event.awayTeam.shortName;
       const homeID = event.homeTeam.id;
       const awayID = event.awayTeam.id;
-      const startTime = event.startTimestamp;
-
-      const eventDateObj = new Date((startTime - 4 * 3600) * 1000); // shift time to EST
-      const selectedDateObj = new Date(date);
 
       // Check if the event date is before the selected date
       if (eventDateObj < selectedDateObj) {
@@ -179,18 +194,26 @@ async function fetchData(sport, date) {
       const eventTypeText = document.createElement("span");
 
       // Color the event type based on its status
-      if (eventType === "inprogress") {
-        eventTypeText.style.color = "orange";
-        eventTypeText.textContent = "In Progress";
-      } else if (eventType === "finished") {
-        eventTypeText.style.color = "green";
-        eventTypeText.textContent = "Finished";
-      } else if (eventType === "notstarted") {
-        eventTypeText.style.color = "white";
-        eventTypeText.textContent = "Not Started";
-      } else if (eventType === "postponed") {
-        eventTypeText.style.color = "red";
-        eventTypeText.textContent = "Postponed";
+      switch (eventType) {
+        case "inprogress":
+          eventTypeText.style.color = "orange";
+          eventTypeText.textContent = "In Progress";
+          break;
+        case "finished":
+          eventTypeText.style.color = "green";
+          eventTypeText.textContent = "Finished";
+          break;
+        case "notstarted":
+          eventTypeText.style.color = "white";
+          eventTypeText.textContent = "Not Started";
+          break;
+        case "postponed":
+          eventTypeText.style.color = "red";
+          eventTypeText.textContent = "Postponed";
+          break;
+        default:
+          // Do nothing
+          break;
       }
 
       // Append timestamp and event type to the info container
@@ -212,7 +235,7 @@ async function fetchData(sport, date) {
       homeTeamDiv.style.alignItems = "center";
 
       const homeLogo = document.createElement("img");
-      homeLogo.src = `https://api.sofascore.app/api/v1/team/${homeID}/image`;
+      homeLogo.src = `${BASE_APP_URL}/team/${homeID}/image`;
       homeLogo.alt = `${homeTeam} logo`;
       homeLogo.style.width = "24px";
       homeLogo.style.height = "24px";
@@ -230,7 +253,7 @@ async function fetchData(sport, date) {
       awayTeamDiv.style.alignItems = "center";
 
       const awayLogo = document.createElement("img");
-      awayLogo.src = `https://api.sofascore.app/api/v1/team/${awayID}/image`;
+      awayLogo.src = `${BASE_APP_URL}/team/${awayID}/image`;
       awayLogo.alt = `${awayTeam} logo`;
       awayLogo.style.width = "24px";
       awayLogo.style.height = "24px";
@@ -260,31 +283,18 @@ async function fetchData(sport, date) {
   }
 }
 
-// Set up event listeners for sport and date selection
-document.getElementById("sport-select").addEventListener("change", function () {
-  const selectedSport = this.value;
-  const selectedDate = document.getElementById("date-select").value;
-  fetchData(selectedSport, selectedDate);
-});
-
-document.getElementById("date-select").addEventListener("change", function () {
-  const selectedSport = document.getElementById("sport-select").value;
-  const selectedDate = this.value;
-  fetchData(selectedSport, selectedDate);
-});
-
 // Set defaults
 document.getElementById("date-select").value = getCurrentDate();
 fetchData("american-football", getCurrentDate());
 
-// Chrome-specific behavior for opening sidePanel
-if (typeof chrome.sidePanel !== "undefined") {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
-}
+// Set up the side panel (chrome based browsers only)
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error));
 
-// Re-fetch the data every minute
+// Refresh data
 setInterval(() => {
   const selectedSport = document.getElementById("sport-select").value;
   const selectedDate = document.getElementById("date-select").value;
   fetchData(selectedSport, selectedDate);
-}, 60000); // 60000 milliseconds = 1 minute
+}, REFRESH_INTERVAL);
