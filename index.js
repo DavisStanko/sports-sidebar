@@ -368,7 +368,8 @@ function createScoreDiv(score) {
   const scoreDiv = document.createElement("div");
   scoreDiv.style.textAlign = "right";
   scoreDiv.style.minWidth = "40px";
-  scoreDiv.textContent = score?.display || "TBD";
+  scoreDiv.textContent =
+    score !== null && score !== undefined ? score.display : "";
   return scoreDiv;
 }
 
