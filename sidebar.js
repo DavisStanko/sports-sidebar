@@ -6,11 +6,24 @@ const MAJOR_LEAGUES = ["NBA", "MLB", "NHL", "NFL"];
 const REFRESH_INTERVAL = 60000; // 1 minute
 
 // DOM Elements
-const sportSelect = document.getElementById("sport-select");
-const dateSelect = document.getElementById("date-select");
-const hideFinishedCheckbox = document.getElementById("hide-finished");
-const hideNotStartedCheckbox = document.getElementById("hide-not-started");
-const longnamesCheckbox = document.getElementById("longnames");
+let sportSelect;
+let dateSelect;
+let hideFinishedCheckbox;
+let hideNotStartedCheckbox;
+let longnamesCheckbox;
+
+// Wait for DOM to be loaded
+document.addEventListener("DOMContentLoaded", () => {
+  // Initialize DOM elements
+  sportSelect = document.getElementById("sport-select");
+  dateSelect = document.getElementById("date-select");
+  hideFinishedCheckbox = document.getElementById("hide-finished");
+  hideNotStartedCheckbox = document.getElementById("hide-not-started");
+  longnamesCheckbox = document.getElementById("longnames");
+
+  // Initialize the application
+  initializeApp();
+});
 
 // Utility Functions
 function getCurrentDate() {
@@ -32,15 +45,15 @@ function formatEventTime(timestamp) {
 
 // Settings Management
 function loadSettings() {
-  const sport = localStorage.getItem("selectedSport") || "football";
-  const hideFinished = localStorage.getItem("hideFinished") === "true";
-  const hideNotStarted = localStorage.getItem("hideNotStarted") === "true";
-  const longnames = localStorage.getItem("longnames") === "true";
+  const sport = localStorage.getItem("selectedSport");
+  const hideFinished = localStorage.getItem("hideFinished");
+  const hideNotStarted = localStorage.getItem("hideNotStarted");
+  const longnames = localStorage.getItem("longnames");
 
-  sportSelect.value = sport;
-  hideFinishedCheckbox.checked = hideFinished;
-  hideNotStartedCheckbox.checked = hideNotStarted;
-  longnamesCheckbox.checked = longnames;
+  sportSelect.value = sport || "football"; // Default to football
+  hideFinishedCheckbox.checked = hideFinished === "true"; // Default to not checked
+  hideNotStartedCheckbox.checked = hideNotStarted === "true"; // Default to not checked
+  longnamesCheckbox.checked = longnames === "true"; // Default to not checked
 }
 
 function saveSettings() {
@@ -114,6 +127,7 @@ async function fetchData(sport, date) {
     }
   } catch (error) {
     console.error("Fetch error:", error);
+    displayNoEventsMessage(scoresDiv, "An error occurred while fetching data.");
   }
 }
 
@@ -385,41 +399,16 @@ function dimLosingTeam(event, homeTeamDiv, awayTeamDiv) {
   }
 }
 
-function dimLosingTeam(event, homeTeamDiv, awayTeamDiv) {
-  const homeTeamText = homeTeamDiv.querySelector("span");
-  const awayTeamText = awayTeamDiv.querySelector("span");
-
-  if (event.winnerCode === 1) {
-    awayTeamText.style.opacity = "0.5";
-  } else if (event.winnerCode === 2) {
-    homeTeamText.style.opacity = "0.5";
-  }
-}
-
 // Initialization and Refresh
 function initializeApp() {
   loadSettings();
   const currentDate = getCurrentDate();
   dateSelect.value = currentDate;
   fetchData(sportSelect.value, currentDate);
-
-  setupSidePanel();
-
+  setupEventListeners();
   setInterval(refreshData, REFRESH_INTERVAL);
 }
 
 function refreshData() {
   fetchData(sportSelect.value, dateSelect.value);
 }
-
-function setupSidePanel() {
-  if (chrome && chrome.sidePanel) {
-    chrome.sidePanel
-      .setPanelBehavior({ openPanelOnActionClick: true })
-      .catch((error) => console.error(error));
-  }
-}
-
-// Initialize the application
-initializeApp();
-setupEventListeners();

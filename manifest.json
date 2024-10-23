@@ -5,7 +5,7 @@
   "description": "A simple Chrome extension that shows sports data in the sidebar",
   "permissions": ["sidePanel"],
   "background": {
-    "service_worker": "index.js"
+    "service_worker": "background.js"
   },
   "action": {
     "default_icon": {
