@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Sports Scores Chrome Extension provides real-time updates on sports events, allowing users to stay informed about their favorite teams and matches. This extension offers a customizable experience with various settings and features to enhance user interaction.
+Stay updated with live sports scores right in your browser! The Sports Scores sidebar extension allows you to easily track your favorite sports events in real-time. Perfect for multitaskers who want to stay informed while browsing the web.
 
 ## Features
 
