@@ -1,6 +1,6 @@
-# Sports Scores Chrome Extension
+# Sports Sidebar
 
-## Overview
+## About
 
 Stay updated with live sports scores right in your browser! The Sports Scores sidebar extension allows you to easily track your favorite sports events in real-time. Perfect for multitaskers who want to stay informed while browsing the web.
 
@@ -36,4 +36,4 @@ To install the Sports Scores Chrome Extension, visit the [Chrome Web Store](http
 ## License
 
 This project is licensed under the [GPL-3.0](LICENSE.md)
-GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details.This project is licensed under the MIT License.
+GNU General Public License — see the [LICENSE.md](LICENSE.md) file for details.
