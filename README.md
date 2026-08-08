@@ -2,6 +2,8 @@
 
 Chrome extension keeping you updated with live sports scores while you browse. Lightweight, non-intrusive sidebar for real-time game tracking.
 
+![Sports Sidebar screenshot](demo.png)
+
 ## How to use
 
 1. Install the extension from the [Chrome Web Store](https://chromewebstore.google.com/detail/sports-sidebar/cdobdanfodbnnipopddpmhllajndjiko).
