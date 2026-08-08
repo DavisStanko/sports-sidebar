@@ -2,7 +2,9 @@
 
 Chrome extension keeping you updated with live sports scores while you browse. Lightweight, non-intrusive sidebar for real-time game tracking.
 
-![Sports Sidebar screenshot](demo.png)
+<p align="center">
+  <img src="demo.png" alt="Sports Sidebar screenshot" />
+</p>
 
 ## How to use
 
